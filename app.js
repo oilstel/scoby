@@ -40,6 +40,6 @@ app.use(express.static(__dirname + '/public', {
     extensions: ['html', 'htm'],
 }));
 
-app.listen(process.env.PORT || 3000, process.env.IP || '0.0.0.0', ()=>{
+app.listen(process.env.PORT || 3001, process.env.IP || '0.0.0.0', ()=>{
   console.log('connected to database, app listening on port 3000')
 });
