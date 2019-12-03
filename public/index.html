@@ -27,21 +27,11 @@
 
         <script>
             document.addEventListener("DOMContentLoaded", function(){
-                // get links
-                var path = window.location.pathname;
-                // console.log(path);
-
                 getSites();
-
-                // document.getElementById("createpage").addEventListener("click", function(event){
-                //     event.preventDefault()
-                //     createPage();
-                // });
-
             });
 
             function getSites() {
-                fetch('/sites')
+                fetch('/api/sites')
                 .then(response => response.json())
                 .then(data => {
                     var scobies = document.getElementById('scobies');
@@ -64,64 +54,17 @@
 
             function shuffle(array) {
                 var currentIndex = array.length, temporaryValue, randomIndex;
-
                 // While there remain elements to shuffle...
                 while (0 !== currentIndex) {
-
                     // Pick a remaining element...
                     randomIndex = Math.floor(Math.random() * currentIndex);
                     currentIndex -= 1;
-
                     // And swap it with the current element.
                     temporaryValue = array[currentIndex];
                     array[currentIndex] = array[randomIndex];
                     array[randomIndex] = temporaryValue;
                 }
-
                 return array;
-            }
-
-
-            function createPage() {
-                var username = document.getElementById('username').value;
-                var color = document.getElementById('color').value;
-                var arena_url = document.getElementById('arenachannel').value;
-                var arena_channel = /[^/]*$/.exec(arena_url)[0];
-                console.log('channel: ' + arena_channel);
-
-                fetch('/getid/' + arena_channel)
-                .then(response => response.json())
-                .then(data => {
-                    // console.log(data.id);
-                    var arena_id = data.id
-                    return arena_id;
-
-                    // save scoby, id, color to database
-
-
-                    // fetch('/post/' + '?username=' + username + '?channel' + data.id + '?arenachannel=' + arena_id)
-                    // .then(response => response.json())
-                    // .then(data => {
-                    //     console.log(data.id);
-
-                    //     // save scoby, id, color to database
-
-                    // })
-                    // .catch(error => console.error(error))
-
-                })
-                // .then(arena_id => {
-
-                //     console.log('next: ' + arena_id);
-
-                //     fetch('/post' + '?username=' + username + '?arenachannel=' + arena_id + '?color=' + color, {
-                //         method: "POST"
-                //     }).then(res => {
-                //         console.log("Request complete! response:", res);
-                //     });
-
-                // })
-                // .catch(error => console.error(error))
             }
         </script>
 

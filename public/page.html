@@ -2,7 +2,7 @@
 <html>
     <head>
         <meta charset="utf-8">
-        <title>...</title>
+        <title></title>
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width,initial-scale=1.0">
         <link href="css/page.css" rel="stylesheet">
@@ -21,19 +21,9 @@
                 var path = window.location.pathname;
                 console.log(path);
 
-                // loadJSON('/api/poems-prose', finished);
-
-                // function finished(data) {
-                //     console.log(data);
-                // }
-
-                var title = document.getElementById('title');
                 var pretty_title = path.slice(1);
-                // title.innerHTML = pretty_title
 
-                // scoby name
-                // query scoby in db for channel id
-                // pass in channel id to get json
+                document.title = pretty_title;
 
                 fetch('/api' + path)
                 .then(response => response.json())
@@ -91,14 +81,6 @@
                         } else {
                             blocks.appendChild(div);
                         }
-
-                        // if(item.type == 'office_tunes')
-                        //     officeTunes.appendChild(p);
-                        // else if(item.type == 'coffee_break')
-                        //     coffeeBreak.appendChild(p);
-                        // else if(item.type == 'mouse_pad') {
-                        //     mousePad.appendChild(p);
-                        // }
                     });
                 })
                 .catch(error => console.error(error))
