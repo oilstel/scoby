@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Scoby</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width,initial-scale=1.0">
+        <link href="css/home.css" rel="stylesheet">
+    </head>
+        
+    <body>
+
+        <main id="home">
+            <div id="welcome">
+                <h1>Scoby</h1>
+                    
+                <div id="about">
+                    <p>A page creator built on <a href="https://are.na">Are.na</a>. Connect a channel to <a href="https://www.are.na/elliott-cost/scoby">this channel</a> to create a Scoby. Style your Scoby by adding a block titled "stylesheet" with some CSS to your channel.</p>
+                </div>
+    
+            </div>
+
+        </main>
+
+        <div id="scobies">
+        </div>
+
+        <script>
+            document.addEventListener("DOMContentLoaded", function(){
+                // get links
+                var path = window.location.pathname;
+                // console.log(path);
+
+                getSites();
+
+                // document.getElementById("createpage").addEventListener("click", function(event){
+                //     event.preventDefault()
+                //     createPage();
+                // });
+
+            });
+
+            function getSites() {
+                fetch('/sites')
+                .then(response => response.json())
+                .then(data => {
+                    var scobies = document.getElementById('scobies');
+
+                    var shuffled_data = shuffle(data.contents);
+
+                    console.log(shuffled_data);
+
+                    shuffled_data.map((item) => {
+                        if (item.class == 'Channel') {
+                            var link = `
+                                <a href="${item.slug}">${item.title}</a>
+                            `;
+                            scobies.insertAdjacentHTML('beforeend', link);
+                        }
+                    })
+                })
+                .catch(error => console.error(error))
+            }
+
+            function shuffle(array) {
+                var currentIndex = array.length, temporaryValue, randomIndex;
+
+                // While there remain elements to shuffle...
+                while (0 !== currentIndex) {
+
+                    // Pick a remaining element...
+                    randomIndex = Math.floor(Math.random() * currentIndex);
+                    currentIndex -= 1;
+
+                    // And swap it with the current element.
+                    temporaryValue = array[currentIndex];
+                    array[currentIndex] = array[randomIndex];
+                    array[randomIndex] = temporaryValue;
+                }
+
+                return array;
+            }
+
+
+            function createPage() {
+                var username = document.getElementById('username').value;
+                var color = document.getElementById('color').value;
+                var arena_url = document.getElementById('arenachannel').value;
+                var arena_channel = /[^/]*$/.exec(arena_url)[0];
+                console.log('channel: ' + arena_channel);
+
+                fetch('/getid/' + arena_channel)
+                .then(response => response.json())
+                .then(data => {
+                    // console.log(data.id);
+                    var arena_id = data.id
+                    return arena_id;
+
+                    // save scoby, id, color to database
+
+
+                    // fetch('/post/' + '?username=' + username + '?channel' + data.id + '?arenachannel=' + arena_id)
+                    // .then(response => response.json())
+                    // .then(data => {
+                    //     console.log(data.id);
+
+                    //     // save scoby, id, color to database
+
+                    // })
+                    // .catch(error => console.error(error))
+
+                })
+                // .then(arena_id => {
+
+                //     console.log('next: ' + arena_id);
+
+                //     fetch('/post' + '?username=' + username + '?arenachannel=' + arena_id + '?color=' + color, {
+                //         method: "POST"
+                //     }).then(res => {
+                //         console.log("Request complete! response:", res);
+                //     });
+
+                // })
+                // .catch(error => console.error(error))
+            }
+        </script>
+
+    </body>
+</html>

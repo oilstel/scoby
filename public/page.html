@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>...</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width,initial-scale=1.0">
+        <link href="css/page.css" rel="stylesheet">
+    </head>
+        
+    <body>
+
+        <!-- <h1 id="title"></h1> -->
+
+        <div id="blocks">
+        </div>
+
+        <script>
+            document.addEventListener("DOMContentLoaded", function(){
+                // get links
+                var path = window.location.pathname;
+                console.log(path);
+
+                // loadJSON('/api/poems-prose', finished);
+
+                // function finished(data) {
+                //     console.log(data);
+                // }
+
+                var title = document.getElementById('title');
+                var pretty_title = path.slice(1);
+                // title.innerHTML = pretty_title
+
+                // scoby name
+                // query scoby in db for channel id
+                // pass in channel id to get json
+
+                fetch('/api' + path)
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                    var head = document.getElementsByTagName('head');
+                    var title = document.getElementById('title');
+                    var blocks = document.getElementById('blocks');
+
+                    data.map((item) => {
+                        var div = document.createElement("div");
+                        console.log(item);
+
+                        if (item.class == 'Text') {
+                            console.log('text');
+                            div.innerHTML = `
+                                ${item.content_html}
+                            `;
+                        } else if (item.class == 'Link') {
+                            console.log('link');
+                            div.innerHTML = `
+                                <p><a href="${item.source.url}">${item.source.url}</a></p>
+                            `;
+                        } else if (item.class == 'Image') {
+                            console.log('image');
+                            div.innerHTML = `
+                                <figure><img src="${item.image.large.url}"/></figure>
+                                <p>${item.content}</p>
+                            `;
+                        } else if (item.class == 'Attachment') {
+                            console.log('attachment');
+                            if (item.attachment.content_type == 'video/mp4') {
+                                div.innerHTML = `
+                                    <video controls>
+                                        <source src="${item.attachment.url}" type="video/mp4">
+                                    </video>
+                                `;
+                            }
+                        }
+
+                        if (item.title == 'stylesheet') {
+                            var css = item.content,
+                                head = document.head || document.getElementsByTagName('head')[0],
+                                style = document.createElement('style');
+
+                            head.appendChild(style);
+
+                            style.type = 'text/css';
+                            if (style.styleSheet){
+                                // This is required for IE8 and below.
+                                style.styleSheet.cssText = css;
+                            } else {
+                                style.appendChild(document.createTextNode(css));
+                            }
+                        } else {
+                            blocks.appendChild(div);
+                        }
+
+                        // if(item.type == 'office_tunes')
+                        //     officeTunes.appendChild(p);
+                        // else if(item.type == 'coffee_break')
+                        //     coffeeBreak.appendChild(p);
+                        // else if(item.type == 'mouse_pad') {
+                        //     mousePad.appendChild(p);
+                        // }
+                    });
+                })
+                .catch(error => console.error(error))
+
+            });
+        </script>
+
+    </body>
+</html>
