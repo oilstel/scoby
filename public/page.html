@@ -32,7 +32,7 @@
 
                     data.map((item) => {
                         var div = document.createElement("div");
-                        console.log(item);
+                        // console.log(item);
 
                         if (item.class == 'Text') {
                             console.log('text');
@@ -41,20 +41,17 @@
                                 ${item.content_html}
                             `;
                         } else if (item.class == 'Link') {
-                            console.log('link');
                             div.classList.add("link");
                             div.innerHTML = `
                                 <a href="${item.source.url}">${item.source.url}</a>
                             `;
                         } else if (item.class == 'Image') {
-                            console.log('image');
                             div.classList.add("image");
                             div.innerHTML = `
                                 <figure><img src="${item.image.large.url}"/></figure>
                                 <caption>${item.content}</caption>
                             `;
                         } else if (item.class == 'Attachment') {
-                            console.log('attachment');
                             if (item.attachment.content_type == 'video/mp4') {
                                 div.classList.add("video");
                                 div.innerHTML = `
