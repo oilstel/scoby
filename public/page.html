@@ -11,25 +11,21 @@
         
     <body>
 
-        <!-- <h1 id="title"></h1> -->
-
         <div id="blocks">
         </div>
 
         <script>
             document.addEventListener("DOMContentLoaded", function(){
-                // get links
                 var path = window.location.pathname;
-                console.log(path);
-
                 var pretty_title = path.slice(1);
-
+                // var titleEl = document.getElementById('title');
+                // titleEl.innerHTML = pretty_title;
                 document.title = pretty_title;
 
                 fetch('/api' + path)
                 .then(response => response.json())
                 .then(data => {
-                    console.log(data);
+                    // console.log(data);
                     var head = document.getElementsByTagName('head');
                     var title = document.getElementById('title');
                     var blocks = document.getElementById('blocks');
@@ -40,23 +36,27 @@
 
                         if (item.class == 'Text') {
                             console.log('text');
+                            div.classList.add("text");
                             div.innerHTML = `
                                 ${item.content_html}
                             `;
                         } else if (item.class == 'Link') {
                             console.log('link');
+                            div.classList.add("link");
                             div.innerHTML = `
-                                <p><a href="${item.source.url}">${item.source.url}</a></p>
+                                <a href="${item.source.url}">${item.source.url}</a>
                             `;
                         } else if (item.class == 'Image') {
                             console.log('image');
+                            div.classList.add("image");
                             div.innerHTML = `
                                 <figure><img src="${item.image.large.url}"/></figure>
-                                <p>${item.content}</p>
+                                <caption>${item.content}</caption>
                             `;
                         } else if (item.class == 'Attachment') {
                             console.log('attachment');
                             if (item.attachment.content_type == 'video/mp4') {
+                                div.classList.add("video");
                                 div.innerHTML = `
                                     <video controls>
                                         <source src="${item.attachment.url}" type="video/mp4">

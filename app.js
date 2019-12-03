@@ -41,5 +41,5 @@ app.use(express.static(__dirname + '/public', {
 }));
 
 app.listen(process.env.PORT || 3001, process.env.IP || '0.0.0.0', ()=>{
-  console.log('connected to database, app listening on port 3000')
+  console.log('connected to database, app listening on port 3001')
 });
