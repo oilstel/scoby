@@ -16,78 +16,129 @@
         
     <body>
 
+        <div id='loading'>
+            Loading......
+        </div>
         <div id="blocks">
         </div>
 
         <script>
-            document.addEventListener("DOMContentLoaded", function(){
-                var path = window.location.pathname;
-                var pretty_title = path.slice(1);
-                // var titleEl = document.getElementById('title');
-                // titleEl.innerHTML = pretty_title;
+            const path = window.location.pathname;
+            const pretty_title = path.slice(1);
+            const head = document.getElementsByTagName('head');
+            const title = document.getElementById('title');
+            const blocks = document.getElementById('blocks');
+            const loading = document.getElementById('loading');
+            let page = 0
+
+            let CONTENT = []
+            
+            function init () {
                 document.title = pretty_title;
+                makeRequest(page)
+            }
 
-                fetch('/api' + path)
-                .then(response => response.json())
-                .then(data => {
-                    // console.log(data);
-                    var head = document.getElementsByTagName('head');
-                    var title = document.getElementById('title');
-                    var blocks = document.getElementById('blocks');
+            // I put this in a separate function because I noticed 
+            // certain are.na channels order from most recent to least
+            // and certain channels order the inverse.
+            // my speculation is that channels added after the feature
+            // to rearrange blocks order by oldest->newest
+            // so I had the issue of my stylesheet block loading 
+            // in the very end. with the 100 limit not even at all.
+            // so I wait until all the posts are loaded, then add them to
+            // the body.
 
-                    data.map((item) => {
-                        var div = document.createElement("div");
-                        // console.log(item);
+            // not an elegant solution if you have 200+ blocks, or large images, perhaps consider adding lazy-loading 
+            function setupContent (data) {
+                data.map((item) => {
+                    var div = document.createElement("div");
+                    // console.log(item);
 
-                        if (item.class == 'Text') {
-                            div.classList.add("text");
-                            div.innerHTML = `
+                    if (item.class == 'Text') {
+                        div.classList.add("text");
+                        div.innerHTML = `
                                 ${item.content_html}
                             `;
-                        } else if (item.class == 'Link') {
-                            div.classList.add("link");
-                            div.innerHTML = `
+                    } else if (item.class == 'Link') {
+                        div.classList.add("link");
+                        div.innerHTML = `
                                 <a href="${item.source.url}">${item.source.url}</a>
                             `;
-                        } else if (item.class == 'Image') {
-                            div.classList.add("image");
-                            div.innerHTML = `
+                    } else if (item.class == 'Image') {
+                        div.classList.add("image");
+                        div.innerHTML = `
                                 <figure><img src="${item.image.large.url}"/></figure>
                                 <caption>${item.content}</caption>
                             `;
-                        } else if (item.class == 'Attachment') {
-                            if (item.attachment.content_type == 'video/mp4') {
-                                div.classList.add("video");
-                                div.innerHTML = `
+                    } else if (item.class == 'Attachment') {
+                        if (item.attachment.content_type == 'video/mp4') {
+                            div.classList.add("video");
+                            div.innerHTML = `
                                     <video controls>
                                         <source src="${item.attachment.url}" type="video/mp4">
                                     </video>
                                 `;
-                            }
                         }
+                    }
 
-                        if (item.title == 'stylesheet') {
-                            var css = item.content,
-                                head = document.head || document.getElementsByTagName('head')[0],
-                                style = document.createElement('style');
+                    if (item.title == 'stylesheet') {
+                        var css = item.content,
+                            head = document.head || document.getElementsByTagName('head')[0],
+                            style = document.createElement('style');
 
-                            head.appendChild(style);
+                        head.appendChild(style);
 
-                            style.type = 'text/css';
-                            if (style.styleSheet){
-                                // This is required for IE8 and below.
-                                style.styleSheet.cssText = css;
-                            } else {
-                                style.appendChild(document.createTextNode(css));
-                            }
+                        style.type = 'text/css';
+                        if (style.styleSheet) {
+                            // This is required for IE8 and below.
+                            style.styleSheet.cssText = css;
                         } else {
-                            blocks.appendChild(div);
+                            style.appendChild(document.createTextNode(css));
                         }
-                    });
-                })
-                .catch(error => console.error(error))
+                    } else {
+                        blocks.appendChild(div);
+                    }
+                });
+            }
+            
 
-            });
+            function conclude () {
+                // callback once there are no more blocks to add
+                loading.remove()
+
+                // moved reverse function here once posts are loaded
+                CONTENT.reverse()
+                setupContent(CONTENT)
+            }
+
+            function makeRequest () {
+                // limit ... to 20x64
+                if (page >= 20 && page === false) {
+                    conclude()
+                    return false
+                }
+                
+                page++
+
+                fetch(`/api${path}?page=${page}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        // if there are no more blocks in the last request
+                        // requires an additional request to see if req is empty
+                        if (data.length === 0) { 
+                            conclude()
+                            page = false 
+                            return false
+                        }
+
+                        // keep appending to the content array
+                        CONTENT = [...CONTENT, ...data]
+                        makeRequest()
+                    })
+                    .catch(error => console.error(error))
+            }
+
+            document.addEventListener("DOMContentLoaded", init);
         </script>
 
     </body>
