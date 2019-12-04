@@ -49,17 +49,7 @@
                 })
             }
 
-            // I put this in a separate function because I noticed 
-            // certain are.na channels order from most recent to least
-            // and certain channels order the inverse.
-            // my speculation is that channels added after the feature
-            // to rearrange blocks order by oldest->newest
-            // so I had the issue of my stylesheet block loading 
-            // in the very end. with the 100 limit not even at all.
-            // so I wait until all the posts are loaded, then add them to
-            // the body.
 
-            // not an elegant solution if you have 200+ blocks, or large images, perhaps consider adding lazy-loading 
             function setupContent (data) {
                 data.map((item) => {
                     var div = document.createElement("div");
