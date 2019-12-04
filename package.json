@@ -4,7 +4,8 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node app.js",
+    "dev": "nodemon app.js"
   },
   "author": "",
   "license": "ISC",
@@ -16,5 +17,8 @@
     "express-validator": "^6.3.0",
     "mongodb": "^3.3.5",
     "path": "^0.12.7"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.1"
   }
 }

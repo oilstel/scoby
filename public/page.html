@@ -12,82 +12,147 @@
         <meta name="twitter:title" content="Scoby">
         <meta name="twitter:description" content="Create pages with Are.na">
         <meta name="twitter:image" content="https://scoby.page/images/social.jpg">
+
     </head>
         
     <body>
-
         <div id="blocks">
         </div>
 
+        <div id='loading'>Loading...</div>
+        <button id='load-more'>Load more</button>
+
         <script>
-            document.addEventListener("DOMContentLoaded", function(){
-                var path = window.location.pathname;
-                var pretty_title = path.slice(1);
-                // var titleEl = document.getElementById('title');
-                // titleEl.innerHTML = pretty_title;
+            const path = window.location.pathname;
+            const pretty_title = path.slice(1);
+            const head = document.getElementsByTagName('head');
+            const title = document.getElementById('title');
+            const blocks = document.getElementById('blocks');
+            const loadMoreBtn = document.getElementById('load-more')
+            const loadingEl = document.getElementById('loading')
+            
+            let perPage = 48
+            let page = 0
+            let loading = false
+            let initialSetup = false
+
+            let CONTENT = []
+            
+            function init () {
                 document.title = pretty_title;
+                makeRequest()
 
-                fetch('/api' + path)
-                .then(response => response.json())
-                .then(data => {
-                    // console.log(data);
-                    var head = document.getElementsByTagName('head');
-                    var title = document.getElementById('title');
-                    var blocks = document.getElementById('blocks');
+                loadMoreBtn.addEventListener('click', () => {
+                    if (!loading) {
+                        makeRequest()
+                    }
+                })
+            }
 
-                    data.map((item) => {
-                        var div = document.createElement("div");
-                        // console.log(item);
 
-                        if (item.class == 'Text') {
-                            div.classList.add("text");
-                            div.innerHTML = `
+            function setupContent (data) {
+                data.map((item) => {
+                    var div = document.createElement("div");
+                    // console.log(item);
+
+                    if (item.class == 'Text') {
+                        div.classList.add("text");
+                        div.innerHTML = `
                                 ${item.content_html}
                             `;
-                        } else if (item.class == 'Link') {
-                            div.classList.add("link");
-                            div.innerHTML = `
+                    } else if (item.class == 'Link') {
+                        div.classList.add("link");
+                        div.innerHTML = `
                                 <a href="${item.source.url}">${item.source.url}</a>
                             `;
-                        } else if (item.class == 'Image') {
-                            div.classList.add("image");
-                            div.innerHTML = `
+                    } else if (item.class == 'Image') {
+                        div.classList.add("image");
+                        div.innerHTML = `
                                 <figure><img src="${item.image.large.url}"/></figure>
                                 <caption>${item.content}</caption>
                             `;
-                        } else if (item.class == 'Attachment') {
-                            if (item.attachment.content_type == 'video/mp4') {
-                                div.classList.add("video");
-                                div.innerHTML = `
+                    } else if (item.class == 'Attachment') {
+                        if (item.attachment.content_type == 'video/mp4') {
+                            div.classList.add("video");
+                            div.innerHTML = `
                                     <video controls>
                                         <source src="${item.attachment.url}" type="video/mp4">
                                     </video>
                                 `;
-                            }
                         }
+                    }
 
-                        if (item.title == 'stylesheet') {
-                            var css = item.content,
-                                head = document.head || document.getElementsByTagName('head')[0],
-                                style = document.createElement('style');
+                    if (item.title == 'stylesheet') {
+                        var css = item.content,
+                            head = document.head || document.getElementsByTagName('head')[0],
+                            style = document.createElement('style');
 
-                            head.appendChild(style);
+                        head.appendChild(style);
 
-                            style.type = 'text/css';
-                            if (style.styleSheet){
-                                // This is required for IE8 and below.
-                                style.styleSheet.cssText = css;
-                            } else {
-                                style.appendChild(document.createTextNode(css));
-                            }
+                        style.type = 'text/css';
+                        if (style.styleSheet) {
+                            // This is required for IE8 and below.
+                            style.styleSheet.cssText = css;
                         } else {
-                            blocks.appendChild(div);
+                            style.appendChild(document.createTextNode(css));
                         }
-                    });
-                })
-                .catch(error => console.error(error))
+                    } else {
+                        blocks.appendChild(div);
+                    }
+                });
+            }
 
-            });
+            function conclude () {
+                // callback once there are no more blocks to add
+                // moved reverse function here once posts are loaded
+                endLoading()
+                loadMoreBtn.remove()
+            }
+
+            function startLoading () {
+                loading = true
+                loadMoreBtn.classList.remove('able-to-load')
+                loadingEl.classList.remove('done-loading')
+            }
+
+            function endLoading () {
+                window.scrollTo(0, window.scrollY + loadMoreBtn.offsetHeight)
+                loading = false
+                loadingEl.classList.add('done-loading')
+            }
+
+            function makeRequest () {
+                startLoading()
+                // limit ... to 20x64
+                if (page === false) return false
+                
+                page++
+
+                fetch(`/api${path}?page=${page}&per=${perPage}`)
+                    .then(response => response.json())
+                    .then(data => {
+
+
+                        if (data.length < perPage) {
+                            setupContent(data)
+                            conclude()
+                            page = false
+                            return false
+                        } else {
+                            loadMoreBtn.classList.add('able-to-load')
+                        }
+                        
+                        // keep appending to the content array
+                        // CONTENT = [...CONTENT, ...data]
+                        endLoading()
+                        setupContent(data)
+                    })
+
+                    //2 do add error support
+                    .catch(error => console.error(error))
+            }
+
+            document.addEventListener("DOMContentLoaded", init);
         </script>
 
     </body>

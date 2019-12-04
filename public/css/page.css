@@ -47,3 +47,26 @@ ul li {
 a {
     color: #000;
 }
+
+#load-more {
+    outline: none;
+    border: 1px solid black;
+    cursor: pointer;
+    display: none;
+}
+
+#load-more, #loading {
+    width: 100%;
+    padding: 2rem;
+    border-radius: 50%;
+    text-align: center;
+    font-size: 50px;
+    letter-spacing:-0.06em;
+}
+
+#load-more:hover {
+    border-radius: 2rem;
+}
+
+#load-more.able-to-load {display: block}
+#loading.done-loading {display: none}
