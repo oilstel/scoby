@@ -105,6 +105,7 @@
             function conclude () {
                 // callback once there are no more blocks to add
                 // moved reverse function here once posts are loaded
+                endLoading()
                 loadMoreBtn.remove()
             }
 
@@ -130,7 +131,10 @@
                 fetch(`/api${path}?page=${page}&per=${perPage}`)
                     .then(response => response.json())
                     .then(data => {
+
+
                         if (data.length < perPage) {
+                            setupContent(data)
                             conclude()
                             page = false
                             return false
