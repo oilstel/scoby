@@ -12,15 +12,15 @@
         <meta name="twitter:title" content="Scoby">
         <meta name="twitter:description" content="Create pages with Are.na">
         <meta name="twitter:image" content="https://scoby.page/images/social.jpg">
+
     </head>
         
     <body>
-
-        <div id='loading'>
-            Loading......
-        </div>
         <div id="blocks">
         </div>
+
+        <div id='loading'>Loading...</div>
+        <button id='load-more'>Load more</button>
 
         <script>
             const path = window.location.pathname;
@@ -28,14 +28,25 @@
             const head = document.getElementsByTagName('head');
             const title = document.getElementById('title');
             const blocks = document.getElementById('blocks');
-            const loading = document.getElementById('loading');
+            const loadMoreBtn = document.getElementById('load-more')
+            const loadingEl = document.getElementById('loading')
+            
+            let perPage = 48
             let page = 0
+            let loading = false
+            let initialSetup = false
 
             let CONTENT = []
             
             function init () {
                 document.title = pretty_title;
-                makeRequest(page)
+                makeRequest()
+
+                loadMoreBtn.addEventListener('click', () => {
+                    if (!loading) {
+                        makeRequest()
+                    }
+                })
             }
 
             // I put this in a separate function because I noticed 
@@ -100,41 +111,50 @@
                     }
                 });
             }
-            
 
             function conclude () {
                 // callback once there are no more blocks to add
-                loading.remove()
-
                 // moved reverse function here once posts are loaded
-                CONTENT.reverse()
-                setupContent(CONTENT)
+                loadMoreBtn.remove()
+            }
+
+            function startLoading () {
+                loading = true
+                loadMoreBtn.classList.remove('able-to-load')
+                loadingEl.classList.remove('done-loading')
+            }
+
+            function endLoading () {
+                window.scrollTo(0, window.scrollY + loadMoreBtn.offsetHeight)
+                loading = false
+                loadingEl.classList.add('done-loading')
             }
 
             function makeRequest () {
+                startLoading()
                 // limit ... to 20x64
-                if (page >= 20 && page === false) {
-                    conclude()
-                    return false
-                }
+                if (page === false) return false
                 
                 page++
 
-                fetch(`/api${path}?page=${page}`)
+                fetch(`/api${path}?page=${page}&per=${perPage}`)
                     .then(response => response.json())
                     .then(data => {
-                        // if there are no more blocks in the last request
-                        // requires an additional request to see if req is empty
-                        if (data.length === 0) { 
+                        if (data.length < perPage) {
                             conclude()
-                            page = false 
+                            page = false
                             return false
+                        } else {
+                            loadMoreBtn.classList.add('able-to-load')
                         }
-
+                        
                         // keep appending to the content array
-                        CONTENT = [...CONTENT, ...data]
-                        makeRequest()
+                        // CONTENT = [...CONTENT, ...data]
+                        endLoading()
+                        setupContent(data)
                     })
+
+                    //2 do add error support
                     .catch(error => console.error(error))
             }
 
