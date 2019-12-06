@@ -10,7 +10,10 @@ let arena = new Arena();
 app.use(bodyParser.urlencoded({ extended: false }));
 
 app.get('/api/sites', function(req, res){
-  arena.channel('scoby').get()
+  arena.channel('scoby').get({ page: req.query.page ? req.query.page : 1, per: 64,
+    direction: 'desc',
+    sort: 'position'
+   })
   .then(chan => {
       res.send(chan);
   })
