@@ -39,14 +39,14 @@ a {
     color: #000;
 } */
 
-/* #load-more {
-    outline: none;
-    border: 1px solid black;
+#load-more {
+    /* outline: none;
+    border: 1px solid black; */
     cursor: pointer;
     display: none;
 }
 
-#load-more, #loading {
+/* #load-more, #loading {
     width: 100%;
     padding: 2rem;
     border-radius: 50%;
