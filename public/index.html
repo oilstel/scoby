@@ -42,11 +42,9 @@
                 .then(data => {
                     var scobies = document.getElementById('scobies');
 
-                    var shuffled_data = shuffle(data.contents);
+//                     var shuffled_data = shuffle(data.contents);
 
-                    console.log(shuffled_data);
-
-                    shuffled_data.map((item) => {
+                    data.contents.map((item) => {
                         if (item.class == 'Channel') {
                             var link = `
                                 <a href="${item.slug}">${item.title}</a>
@@ -58,20 +56,20 @@
                 .catch(error => console.error(error))
             }
 
-            function shuffle(array) {
-                var currentIndex = array.length, temporaryValue, randomIndex;
-                // While there remain elements to shuffle...
-                while (0 !== currentIndex) {
-                    // Pick a remaining element...
-                    randomIndex = Math.floor(Math.random() * currentIndex);
-                    currentIndex -= 1;
-                    // And swap it with the current element.
-                    temporaryValue = array[currentIndex];
-                    array[currentIndex] = array[randomIndex];
-                    array[randomIndex] = temporaryValue;
-                }
-                return array;
-            }
+//             function shuffle(array) {
+//                 var currentIndex = array.length, temporaryValue, randomIndex;
+//                 // While there remain elements to shuffle...
+//                 while (0 !== currentIndex) {
+//                     // Pick a remaining element...
+//                     randomIndex = Math.floor(Math.random() * currentIndex);
+//                     currentIndex -= 1;
+//                     // And swap it with the current element.
+//                     temporaryValue = array[currentIndex];
+//                     array[currentIndex] = array[randomIndex];
+//                     array[randomIndex] = temporaryValue;
+//                 }
+//                 return array;
+//             }
         </script>
 
     </body>
