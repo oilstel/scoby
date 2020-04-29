@@ -68,7 +68,7 @@
                     } else if (item.class == 'Image') {
                         div.classList.add("image");
                         div.innerHTML = `
-                                <figure><img src="${item.image.large.url}"/></figure>
+                                <figure><img src="${item.image.original.url}"/></figure>
                                 <caption>${item.content}</caption>
                             `;
                     } else if (item.class == 'Attachment') {
