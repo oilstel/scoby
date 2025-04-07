@@ -123,7 +123,6 @@
 
             function makeRequest () {
                 startLoading()
-                // limit ... to 20x64
                 if (page === false) return false
                 
                 page++
@@ -131,25 +130,33 @@
                 fetch(`/api${path}?page=${page}&per=${perPage}`)
                     .then(response => response.json())
                     .then(data => {
+                        if (data.error) {
+                            console.error('API Error:', data.error);
+                            endLoading();
+                            return;
+                        }
 
-
-                        if (data.length < perPage) {
-                            setupContent(data)
-                            conclude()
-                            page = false
-                            return false
+                        if (data.contents && data.contents.length) {
+                            setupContent(data.contents);
+                            
+                            if (!data.has_more) {
+                                conclude();
+                                page = false;
+                            } else {
+                                loadMoreBtn.classList.add('able-to-load');
+                            }
                         } else {
-                            loadMoreBtn.classList.add('able-to-load')
+                            console.error('No contents found in response:', data);
+                            conclude();
+                            page = false;
                         }
                         
-                        // keep appending to the content array
-                        // CONTENT = [...CONTENT, ...data]
-                        endLoading()
-                        setupContent(data)
+                        endLoading();
                     })
-
-                    //2 do add error support
-                    .catch(error => console.error(error))
+                    .catch(error => {
+                        console.error('Error fetching data:', error);
+                        endLoading();
+                    })
             }
 
             document.addEventListener("DOMContentLoaded", init);

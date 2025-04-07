@@ -106,3 +106,32 @@ a { color: #073a0a; }
         grid-template-columns: 1fr;
     }
 }
+#load-more {
+    width: 100%;
+    padding: 1em;
+    margin: 2em 0;
+    background: #073a0a;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    border-radius: 8px;
+    display: none;
+    transition: background-color 0.3s ease;
+}
+
+#loading {
+    text-align: center;
+    padding: 2em;
+    font-weight: bold;
+    font-size: 16px;
+    color: #073a0a;
+}
+
+#loading.done-loading {
+    display: none;
+}
+
+#load-more:hover {
+    background: #0a4d0e;
+}

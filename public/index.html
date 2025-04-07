@@ -30,46 +30,116 @@
 
         <div id="scobies">
         </div>
+        <div id='loading'>Loading channels...</div>
+        <button id='load-more'>Load more</button>
 
         <script>
-            document.addEventListener("DOMContentLoaded", function(){
-                getSites();
-            });
-
-            function getSites() {
-                fetch('/api/sites')
-                .then(response => response.json())
-                .then(data => {
-                    var scobies = document.getElementById('scobies');
-
-//                     var shuffled_data = shuffle(data.contents);
-
-                    data.contents.map((item) => {
-                        if (item.class == 'Channel') {
-                            var link = `
-                                <a href="${item.slug}">${item.title}</a>
-                            `;
-                            scobies.insertAdjacentHTML('beforeend', link);
+            document.addEventListener('DOMContentLoaded', function() {
+                const channelName = 'scoby';
+                const api = 'https://api.are.na/v2/channels/';
+                let allChannels = [];
+                let displayedCount = 0;
+                const perPage = 64; // Number of channels to display initially
+                const loadMoreBtn = document.getElementById('load-more');
+                const loadingEl = document.getElementById('loading');
+                const scobiesEl = document.getElementById('scobies');
+                
+                async function loadAllChannels() {
+                    let page = 1;
+                    let hasMore = true;
+                    
+                    try {
+                        // First, get channel info to know total contents
+                        const initialResponse = await fetch(`${api}${channelName}`, {
+                            method: 'GET',
+                            headers: { 
+                                'Accept': 'application/json',
+                                'User-Agent': 'Scoby/1.0',
+                                'Cache-Control': 'no-cache' 
+                            }
+                        });
+                        
+                        if (!initialResponse.ok) {
+                            throw new Error(`API request failed: ${initialResponse.status}`);
                         }
-                    })
-                })
-                .catch(error => console.error(error))
-            }
-
-//             function shuffle(array) {
-//                 var currentIndex = array.length, temporaryValue, randomIndex;
-//                 // While there remain elements to shuffle...
-//                 while (0 !== currentIndex) {
-//                     // Pick a remaining element...
-//                     randomIndex = Math.floor(Math.random() * currentIndex);
-//                     currentIndex -= 1;
-//                     // And swap it with the current element.
-//                     temporaryValue = array[currentIndex];
-//                     array[currentIndex] = array[randomIndex];
-//                     array[randomIndex] = temporaryValue;
-//                 }
-//                 return array;
-//             }
+                        
+                        const channelData = await initialResponse.json();
+                        const totalBlocks = channelData.length;
+                        
+                        // Now load all contents with pagination
+                        while (hasMore) {
+                            const response = await fetch(`${api}${channelName}/contents?page=${page}&per=100&direction=desc&sort=position`, {
+                                method: 'GET',
+                                headers: { 
+                                    'Accept': 'application/json',
+                                    'User-Agent': 'Scoby/1.0',
+                                    'Cache-Control': 'no-cache' 
+                                }
+                            });
+                            
+                            if (!response.ok) {
+                                throw new Error(`API request failed: ${response.status}`);
+                            }
+                            
+                            const data = await response.json();
+                            
+                            if (data.contents && data.contents.length) {
+                                data.contents.forEach(item => {
+                                    if (item.class === 'Channel') {
+                                        allChannels.push(item);
+                                    }
+                                });
+                                
+                                page++;
+                                hasMore = data.contents.length === 100; // Check if we need to fetch more pages
+                            } else {
+                                hasMore = false;
+                            }
+                        }
+                        
+                        // Hide loading indicator and display initial set of channels
+                        loadingEl.classList.add('done-loading');
+                        displayChannels();
+                        
+                        // Show load more button if there are more channels to display
+                        if (displayedCount < allChannels.length) {
+                            loadMoreBtn.style.display = 'block';
+                        }
+                        
+                    } catch (error) {
+                        console.error('Error loading channels:', error);
+                        loadingEl.textContent = 'Error loading channels. Please try again.';
+                    }
+                }
+                
+                function displayChannels() {
+                    const startIndex = displayedCount;
+                    const endIndex = Math.min(startIndex + perPage, allChannels.length);
+                    
+                    for (let i = startIndex; i < endIndex; i++) {
+                        const channel = allChannels[i];
+                        const link = `
+                            <a href="${channel.slug}">${channel.title}</a>
+                        `;
+                        scobiesEl.insertAdjacentHTML('beforeend', link);
+                    }
+                    
+                    displayedCount = endIndex;
+                    
+                    // Hide load more button if all channels are displayed
+                    if (displayedCount >= allChannels.length) {
+                        loadMoreBtn.style.display = 'none';
+                    }
+                }
+                
+                // Add click event for load more button
+                loadMoreBtn.addEventListener('click', function() {
+                    displayChannels();
+                });
+                
+                // Start loading channels
+                loadAllChannels();
+            });
         </script>
 
     </body>
