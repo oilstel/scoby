@@ -10,14 +10,13 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "body-parser": "^1.19.0",
-    "dotenv": "^8.2.0",
+    "body-parser": "^2.2.0",
+    "dotenv": "^16.4.7",
     "express": "^4.17.1",
-    "express-validator": "^6.3.0",
-    "mongodb": "^3.3.5",
+    "express-validator": "^7.2.1",
     "path": "^0.12.7"
   },
   "devDependencies": {
-    "nodemon": "^2.0.1"
+    "nodemon": "^3.1.9"
   }
 }
