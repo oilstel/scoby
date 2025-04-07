@@ -143,6 +143,6 @@ app.use(express.static(__dirname + '/public', {
   extensions: ['html', 'htm'],
 }));
 
-app.listen(process.env.PORT || 3002, process.env.IP || '0.0.0.0', () => {
-  console.log('app listening on port 3002');
+app.listen(process.env.PORT || 3001, process.env.IP || '0.0.0.0', () => {
+  console.log('app listening on port 3001');
 });
