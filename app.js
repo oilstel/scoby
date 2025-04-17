@@ -68,6 +68,7 @@ app.get('/api/sites', async function(req, res) {
 });
 
 app.get('/api/:site', async function(req, res) {
+    console.log(req.params.site);
     const response = await fetch(`https://api.are.na/v2/channels/${req.params.site}/contents?per=24&page=1&direction=desc&sort=position`, {
         method: 'GET',
         headers: {
