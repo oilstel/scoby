@@ -80,8 +80,6 @@ app.get('/api/:site', async function(req, res) {
     const response = await fetch(`https://api.are.na/v2/channels/${req.params.site}/contents?per=${per}&page=${page}&direction=desc&sort=position`, {
       method: 'GET',
       headers: {
-        'Accept': 'application/json',
-        'User-Agent': 'Scoby/1.0',
         'Cache-Control': 'no-cache'
       }
     });
