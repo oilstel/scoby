@@ -67,10 +67,11 @@
                             `;
                     } else if (item.class == 'Image') {
                         div.classList.add("image");
+                        console.log(item);
                         div.innerHTML = `
                                 <figure>
                                     <img src="${item.image.original.url}" alt="${item.image.original.alt}"/>
-                                    <figcaption>${item.content}</figcaption>
+                                    <figcaption>${item.description}</figcaption>
                                 </figure>
                             `;
                     } else if (item.class == 'Attachment') {
