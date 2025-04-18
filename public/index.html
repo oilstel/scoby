@@ -3,7 +3,7 @@
     <head>
         <meta charset="utf-8">
         <title>Scoby</title>
-        <meta name="description" content="">
+        <meta name="description" content="Turn any Are.na channel into a website.">
         <meta name="viewport" content="width=device-width,initial-scale=1.0">
         <link rel="shortcut icon" type="image/png" href="images/favicon.png">
         <link href="css/home.css" rel="stylesheet">
@@ -18,19 +18,26 @@
 
         <main id="home">
             <div id="welcome">
-                <h1>Scoby</h1>
+                <div id="title-and-description">
+                    <h1>s<span style="color: #950b91;">c</span><span style="color: #69d418;">o</span><span style="color: #c24d0a;">b</span>y.<span style="color: #83950b;">p</span><span style="color: #0b2b95;">a</span><span style="color: #000;">g</span><span style="color: #d319cc;">e</span></h1>
+    
+                    <p>Turn any <b style="color: #34a41e;">open</b> or <b style="color: #cb2115;">closed</b> &#10038;&#10038; <a href="https://are.na">Are.na</a> channel into a <b style="color: #1d20c3;">website</b>.</p>
+                </div>
                     
                 <div id="about">
-                    <p>A page creator built on <a href="https://are.na">Are.na</a>. Connect a channel to the <a href="https://www.are.na/elliott-cost/scoby">mother channel</a> to create a Scoby. Style your Scoby by adding a block titled "stylesheet" with some CSS to your channel. Watch a <a href="https://attachments.are.na/35793145/2ec685d4a88d3f6fac11de8803d57144.mp4">short tutorial</a>.</p>
+                    <p style="margin-top: 10px;">Style your Scoby by adding a block titled "stylesheet" with some CSS to your channel</p>
+
+                    <p>Watch a <a href="https://attachments.are.na/35793145/2ec685d4a88d3f6fac11de8803d57144.mp4">short tutorial</a>.</p>
+
+                    <p>Please consider <a href="https://www.patreon.com/elliott-cost">supporting</a> this project.</p>
                 </div>
     
             </div>
-
         </main>
 
         <div id="scobies">
         </div>
-        <div id='loading'>Loading channels...</div>
+        <div id='loading'>Loading scobies...</div>
         <button id='load-more'>Load more</button>
 
         <script>
@@ -118,8 +125,13 @@
                     
                     for (let i = startIndex; i < endIndex; i++) {
                         const channel = allChannels[i];
+                        console.log(channel);
                         const link = `
-                            <a href="${channel.slug}">${channel.title}</a>
+                            <a href="${channel.slug}">
+                                <b>${channel.title}</b><br>
+                                ${channel.user.full_name}<br>
+                                <u>scoby.page/${channel.slug}</u>
+                            </a>
                         `;
                         scobiesEl.insertAdjacentHTML('beforeend', link);
                     }
