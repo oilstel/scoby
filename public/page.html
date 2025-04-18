@@ -85,8 +85,14 @@
                     }
 
                     if (item.title == 'stylesheet') {
-                        var css = item.content,
-                            head = document.head || document.getElementsByTagName('head')[0],
+                        var css = item.content;
+                        
+                        // Remove triple backticks if they exist at the beginning and end
+                        if (css.startsWith('```') && css.endsWith('```')) {
+                            css = css.substring(3, css.length - 3);
+                        }
+                        
+                        var head = document.head || document.getElementsByTagName('head')[0],
                             style = document.createElement('style');
 
                         head.appendChild(style);
