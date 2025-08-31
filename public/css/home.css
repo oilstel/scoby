@@ -1,22 +1,20 @@
 * { box-sizing: border-box; }
 :root {
-    --font-family: Verdana, Arial, Helvetica, sans-serif;
+    --font-family: Arial;
     --text-color: #000;
-    --bg-color: #fff;
+    --bg-color: #f7f8c5;
+    --fs: 24px;
+    --lh: 30px;
 }
 body {
     font-family: var(--font-family);
-    -webkit-font-smoothing: antialiased;
+    /* -webkit-font-smoothing: antialiased;
     -webkit-text-size-adjust: none;
-    -moz-osx-font-smoothing: grayscale;
+    -moz-osx-font-smoothing: grayscale; */
     color: var(--text-color);
     background-color: var(--bg-color);
     padding: 10px 15px;
     margin: 0;
-}
-h1 {
-    font-weight: bold;
-
 }
 ol li, ul li {
     list-style-position: inside;
@@ -25,61 +23,64 @@ ul li {
     list-style-type: none;
     margin-bottom: 1em;
 }
+h1, p {
+    font-size: var(--fs);
+    line-height: var(--lh);
+}
 h1 {
     font-size: 50px;
-    margin-top: 0;
-    margin-bottom: 10px;
+    margin-top: 10px;
 }
 a { color: var(--text-color); }
 
 #title-and-description {
-    width: min-content;
     margin-bottom: 10px;
 }
 
 #welcome {
     display: flex;
-    flex-flow: row wrap;
-    gap: 30px;
-}
-#about {
-    max-width: 400px;
+    flex-flow: column wrap;
+    gap: 0px;
 }
 p {
-    font-size: 16px;
-    line-height: 22px;
+    font-size: var(--fs);
+    line-height: var(--lh);
     margin: 10px 0;
+}
+
+main#home {
+    /* max-width: 400px; */
+    margin: 0 auto;
 }
 
 /* Scobies */
 #scobies {
     display: flex;
-    flex-flow: row wrap;
-    grid-gap: 10px;
-    margin-top: 10px;
-    border-top: 2px dotted #aeaeae;
-    padding-top: 20px;
+    flex-flow: column nowrap;
 }
 #scobies a {
-    border: 1px solid #c3c3c3;
     text-decoration: none;
-    border-radius: 4px;
-    font-size: 14px;
-    padding: 6px;
-    line-height: 18px;
+    font-size: var(--fs);
+    line-height: var(--lh);
+    border-bottom: 1px solid #000000;
+    padding: 8px 0px;
 }
+/* #scobies a:nth-child(odd) {
+    background: #f1f1f1;
+} */
 #scobies a u {
-    font-family: courier;
-    font-size: 14px;
+    color: blue;
+    text-decoration: underline;
+    font-size: 16px;
     word-break: break-all;
-    text-decoration: none;
+    display: none;
 }
 #scobies a:hover {
-    background: #f4f0e4;
+    background-color: #c5ddf372;
 }
 
 #load-more {
-    padding: 8px;
+    padding: 6px;
     margin: 2em 0;
     font-family: var(--font-family);
     border: 1px solid #000;
@@ -98,9 +99,4 @@ p {
 
 #loading.done-loading {
     display: none;
-}
-
-#load-more:hover {
-    color: #fff;
-    background: #1919eb;
 }

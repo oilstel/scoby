@@ -19,34 +19,36 @@
 
         <main id="home">
             <div id="welcome">
-                <div id="title-and-description">
-                    <h1>s<span style="color: #950b91;">c</span><span style="color: #69d418;">o</span><span style="color: #c24d0a;">b</span>y.<span style="color: #83950b;">p</span><span style="color: #0b2b95;">a</span><span style="color: #000;">g</span><span style="color: #d319cc;">e</span></h1>
+                <h1>s<span style="color: #950b91;">c</span><span style="color: #69d418;">o</span><span style="color: #c24d0a;">b</span>y.<span style="color: #83950b;">p</span><span style="color: #0b2b95;">a</span><span style="color: #000;">g</span><span style="color: #d319cc;">e</span></h1>
     
-                    <p>Turn any <b style="color: #34a41e;">open</b> or <b style="color: #cb2115;">closed</b> &#10038;&#10038; <a href="https://are.na">Are.na</a> channel into a <b style="color: #1d20c3;">website</b>.</p>
-                </div>
+                <p>Turn any <span style="color: #208512;">open</span> or <span style="color: #e12727;">closed</span> <a href="https://are.na">Are.na</a> channel into a <span style="color: #1d20c3;">website</span>.</p>
                     
-                <div id="about">
-                    <p style="margin-top: 10px;">Style your Scoby by adding a block titled "stylesheet" with some CSS to your channel.</p>
+                <p style="margin-top: 10px;">Style your Scoby by adding a block titled "stylesheet" with some CSS to your channel.</p>
 
-                    <p>Watch a <a href="https://attachments.are.na/35793145/2ec685d4a88d3f6fac11de8803d57144.mp4">short tutorial</a>.</p>
+                <p>Watch a <a href="https://attachments.are.na/35793145/2ec685d4a88d3f6fac11de8803d57144.mp4">short tutorial</a>.</p>
 
-                    <p>Please consider <a href="https://www.patreon.com/c/elliottcost">supporting</a> this project.</p>
-
-                    <p><small>Made by <a href="https://elliott.computer">Elliott Cost</a></small></p>
-                </div>
+                <p>Please consider <a href="https://www.patreon.com/c/elliottcost">supporting</a> this project. Made by <a href="https://elliott.computer">Elliott Cost</a>.</p>
     
             </div>
-        </main>
 
-        <div id="scobies">
-        </div>
-        <div id='loading'>Loading scobies...</div>
-        <button id='load-more'>Load more</button>
+            <h2><button id='refresh-cache'>Refresh list</button></h2>
+
+            <div id="scobies">
+            </div>
+
+            <div id='loading'>Loading scobies...</div>
+            
+            <div style="margin: 12px 0;">
+                <button id='load-more'>Load more</button>
+            </div>
+
+        </main>
 
         <script>
             document.addEventListener('DOMContentLoaded', function() {
                 const channelName = 'scoby';
                 const api = 'https://api.are.na/v2/channels/';
+                const backend = '/api/sites/all';
                 let allChannels = [];
                 let displayedCount = 0;
                 const perPage = 64; // Number of channels to display initially
@@ -54,31 +56,24 @@
                 const loadingEl = document.getElementById('loading');
                 const scobiesEl = document.getElementById('scobies');
                 
-                async function loadAllChannels() {
-                    let page = 1;
-                    let hasMore = true;
-                    
+                async function loadAllChannels(useBackend = true, refresh = false) {
                     try {
-                        // First, get channel info to know total contents
-                        const initialResponse = await fetch(`${api}${channelName}`, {
-                            method: 'GET',
-                            headers: { 
-                                'Accept': 'application/json',
-                                'User-Agent': 'Scoby/1.0',
-                                'Cache-Control': 'no-cache' 
+                        allChannels = [];
+                        displayedCount = 0;
+                        scobiesEl.innerHTML = '';
+                        loadingEl.classList.remove('done-loading');
+
+                        if (useBackend) {
+                            const url = refresh ? `${backend}?refresh=1` : backend;
+                            const r = await fetch(url, { headers: { 'Accept': 'application/json' } });
+                            if (!r.ok) throw new Error(`Backend request failed: ${r.status}`);
+                            const data = await r.json();
+                            if (Array.isArray(data.contents)) {
+                                allChannels = data.contents;
                             }
-                        });
-                        
-                        if (!initialResponse.ok) {
-                            throw new Error(`API request failed: ${initialResponse.status}`);
-                        }
-                        
-                        const channelData = await initialResponse.json();
-                        const totalBlocks = channelData.length;
-                        
-                        // Now load all contents with pagination
-                        while (hasMore) {
-                            const response = await fetch(`${api}${channelName}/contents?page=${page}&per=100&direction=desc&sort=position`, {
+                        } else {
+                            // Fallback to direct Are.na
+                            const initialResponse = await fetch(`${api}${channelName}`, {
                                 method: 'GET',
                                 headers: { 
                                     'Accept': 'application/json',
@@ -86,25 +81,38 @@
                                     'Cache-Control': 'no-cache' 
                                 }
                             });
-                            
-                            if (!response.ok) {
-                                throw new Error(`API request failed: ${response.status}`);
-                            }
-                            
-                            const data = await response.json();
-                            
-                            if (data.contents && data.contents.length) {
-                                data.contents.forEach(item => {
-                                    if (item.class === 'Channel') {
-                                        allChannels.push(item);
+                            if (!initialResponse.ok) throw new Error(`API request failed: ${initialResponse.status}`);
+                            const channelData = await initialResponse.json();
+                            const totalBlocks = channelData.length || 0;
+                            const per = 50;
+                            const totalPages = Math.max(1, Math.ceil(totalBlocks / per));
+                            const pageNumbers = Array.from({ length: totalPages }, (_, i) => i + 1);
+                            const requests = pageNumbers.map(pageNum => {
+                                return fetch(`${api}${channelName}/contents?page=${pageNum}&per=${per}&direction=desc&sort=position`, {
+                                    method: 'GET',
+                                    headers: { 
+                                        'Accept': 'application/json',
+                                        'User-Agent': 'Scoby/1.0',
+                                        'Cache-Control': 'no-cache' 
                                     }
+                                }).then(r => {
+                                    if (!r.ok) throw new Error(`API request failed: ${r.status}`);
+                                    return r.json().then(data => ({ page: pageNum, data }));
                                 });
-                                
-                                page++;
-                                hasMore = data.contents.length === 100; // Check if we need to fetch more pages
-                            } else {
-                                hasMore = false;
-                            }
+                            });
+                            const pages = await Promise.all(requests);
+                            pages.sort((a, b) => a.page - b.page);
+                            const seenIds = new Set();
+                            pages.forEach(({ data }) => {
+                                if (data && data.contents && data.contents.length) {
+                                    data.contents.forEach(item => {
+                                        if (item.class === 'Channel' && !seenIds.has(item.id)) {
+                                            seenIds.add(item.id);
+                                            allChannels.push(item);
+                                        }
+                                    });
+                                }
+                            });
                         }
                         
                         // Hide loading indicator and display initial set of channels
@@ -131,10 +139,7 @@
                         console.log(channel);
                         const link = `
                             <a href="${channel.slug}">
-                                <b>${channel.title}</b><br>
-                                ${channel.user.full_name}<br>
-                                <u>scoby.page/${channel.slug}</u>
-                            </a>
+                                <b>${channel.title}</b> by ${channel.user.full_name}
                         `;
                         scobiesEl.insertAdjacentHTML('beforeend', link);
                     }
@@ -152,8 +157,14 @@
                     displayChannels();
                 });
                 
+                // Refresh cache button
+                const refreshBtn = document.getElementById('refresh-cache');
+                refreshBtn.addEventListener('click', function() {
+                    loadAllChannels(true, true);
+                });
+                
                 // Start loading channels
-                loadAllChannels();
+                loadAllChannels(true);
             });
         </script>
 
